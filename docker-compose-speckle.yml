@@ -61,7 +61,7 @@ services:
     environment:
       # TODO. Change this to the url of your server. This is the URL of the server as accessed by users.
       CANONICAL_URL: 'http://127.0.0.1'
-      # This is the URL of the server as accessed by other Speckle services within this docker compose network, such as preview-service.
+      # This is the URL of the server as accessed by other Speckle services within this docker compose network.
       # This will be the same value as NUXT_PUBLIC_BACKEND_API_ORIGIN as defined in the frontend-2 service.
       PRIVATE_OBJECTS_SERVER_URL: 'http://speckle-server:3000'
 
@@ -80,8 +80,6 @@ services:
       POSTGRES_DB: 'speckle'
 
       REDIS_URL: 'redis://redis'
-      PREVIEW_SERVICE_USE_PRIVATE_OBJECTS_SERVER_URL: 'true'
-      PREVIEW_SERVICE_REDIS_URL: 'redis://redis'
       FILEIMPORT_SERVICE_USE_PRIVATE_OBJECTS_SERVER_URL: 'true'
       FILEIMPORT_SERVICE_REDIS_URL: 'redis://redis'
 
@@ -107,53 +105,4 @@ services:
       []
       # - minio
       # - redis
-      # - postgres
-
-  preview-service:
-    build:
-      context: .
-      dockerfile: packages/preview-service/Dockerfile
-    platform: linux/amd64
-    image: speckle/speckle-preview-service:local
-    restart: always
-    mem_limit: '3000m'
-    memswap_limit: '3000m'
-    environment:
-      HOST: '127.0.0.1' # The preview service does not need to be exposed outside the container.
-      PORT: '3001'
-      LOG_LEVEL: 'info'
-      LOG_PRETTY: 'true'
-      REDIS_URL: 'redis://redis'
-    depends_on:
-      []
-      # - redis
-
-  webhook-service:
-    build:
-      context: .
-      dockerfile: packages/webhook-service/Dockerfile
-    platform: linux/amd64
-    image: speckle/speckle-webhook-service:local
-    restart: always
-    environment:
-      LOG_LEVEL: 'info'
-      LOG_PRETTY: 'true'
-      PG_CONNECTION_STRING: 'postgres://speckle:speckle@postgres/speckle'
-    depends_on:
-      - speckle-server
-      # - postgres
-
-  ifc-import-server:
-    build:
-      context: .
-      dockerfile: packages/ifc-import-service/Dockerfile
-    platform: linux/amd64
-    image: speckle/ifc-import-service:local
-    restart: always
-    environment:
-      LOG_LEVEL: 'info'
-      LOG_PRETTY: 'true'
-      FILEIMPORT_QUEUE_POSTGRES_URL: 'postgresql://speckle:speckle@postgres/speckle'
-    depends_on:
-      - speckle-server
       # - postgres
